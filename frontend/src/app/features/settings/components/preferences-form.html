@@ -1,0 +1,81 @@
+<form [formRoot]="form" class="form-stack">
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label" for="pref-language">Default letter language</label>
+      <select class="select" id="pref-language" [formField]="form.defaultLetterLanguage">
+        @for (l of languages; track l.code) {
+          <option [value]="l.code">{{ l.name }}</option>
+        }
+      </select>
+      <p class="field-hint">Used when a job posting's language is unknown.</p>
+    </div>
+    <div class="field">
+      <label class="field-label" for="pref-layout">Letter layout</label>
+      <select class="select" id="pref-layout" [formField]="form.letterLayout">
+        @for (l of layouts; track l) {
+          <option [value]="l">{{ label(l) }}</option>
+        }
+      </select>
+      <p class="field-hint">Page layout of exported PDF and Word letters.</p>
+    </div>
+    <div class="field">
+      <label class="field-label" for="pref-model"
+        >AI model <span class="muted">(optional)</span></label
+      >
+      <input
+        class="input"
+        id="pref-model"
+        spellcheck="false"
+        placeholder="Default model"
+        [formField]="form.nimModel"
+      />
+      <p class="field-hint">NVIDIA NIM model name, e.g. meta/llama-3.3-70b-instruct.</p>
+    </div>
+    <div class="field">
+      <label class="field-label" for="pref-parallel">Letters generated at once</label>
+      <input
+        class="input"
+        id="pref-parallel"
+        type="number"
+        [formField]="form.maxParallelGenerations"
+      />
+      <app-field-errors [field]="form.maxParallelGenerations" for="pref-parallel" />
+      <p class="field-hint">
+        For batches. Higher is faster but hits rate limits sooner (1–{{ maxParallel }}).
+      </p>
+    </div>
+    <div class="field">
+      <label class="field-label" for="pref-location"
+        >Default search location <span class="muted">(optional)</span></label
+      >
+      <input
+        class="input"
+        id="pref-location"
+        placeholder="e.g. Berlin"
+        [formField]="form.defaultSearchLocation"
+      />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pref-radius"
+        >Default radius (km) <span class="muted">(optional)</span></label
+      >
+      <input
+        class="input"
+        id="pref-radius"
+        type="number"
+        [formField]="form.defaultSearchRadiusKm"
+      />
+      <app-field-errors [field]="form.defaultSearchRadiusKm" for="pref-radius" />
+    </div>
+  </div>
+  <app-field-errors [field]="form" for="pref-form" />
+  <div class="form-actions">
+    <button
+      type="submit"
+      class="btn btn--primary"
+      [disabled]="form().submitting() || !form().dirty()"
+    >
+      Save preferences
+    </button>
+  </div>
+</form>

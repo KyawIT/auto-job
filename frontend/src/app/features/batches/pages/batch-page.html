@@ -1,0 +1,102 @@
+@if (batch.hasValue()) {
+  @let b = batch.value();
+  @let p = progress()!;
+  <app-page-header
+    [heading]="title(b)"
+    [subtitle]="'Started ' + (b.createdAt | date: 'short')"
+    [back]="{ label: 'Applications', link: '/applications' }"
+  >
+    @if (b.status === 'Running') {
+      <button type="button" class="btn btn--danger-plain" [disabled]="busy()" (click)="cancel()">
+        Cancel batch
+      </button>
+    }
+    @if (p.failed) {
+      <button type="button" class="btn btn--primary" [disabled]="busy()" (click)="retry()">
+        Retry {{ p.failed }} failed
+      </button>
+    }
+  </app-page-header>
+
+  <section class="card summary" aria-label="Progress">
+    <div
+      class="bar"
+      role="progressbar"
+      aria-label="Letters finished"
+      aria-valuemin="0"
+      [attr.aria-valuemax]="p.total"
+      [attr.aria-valuenow]="p.finished"
+      [attr.aria-valuetext]="p.finished + ' of ' + p.total + ' finished'"
+    >
+      <span class="fill" [style.transform]="'scaleX(' + p.fraction + ')'"></span>
+    </div>
+    <dl class="counts">
+      <div>
+        <dt>Done</dt>
+        <dd>{{ p.done }}</dd>
+      </div>
+      <div>
+        <dt>Writing</dt>
+        <dd>{{ p.running }}</dd>
+      </div>
+      <div>
+        <dt>Waiting</dt>
+        <dd>{{ p.queued }}</dd>
+      </div>
+      <div>
+        <dt>Failed</dt>
+        <dd [class.danger]="p.failed">{{ p.failed }}</dd>
+      </div>
+      @if (p.cancelled) {
+        <div>
+          <dt>Cancelled</dt>
+          <dd>{{ p.cancelled }}</dd>
+        </div>
+      }
+    </dl>
+    <p class="visually-hidden" role="status">
+      {{ finished() ? title(b) + '. ' + p.done + ' of ' + p.total + ' letters written.' : '' }}
+    </p>
+    @if (b.status === 'Running') {
+      <p class="caption">You can keep working. Letters appear in Applications as they are done.</p>
+    }
+  </section>
+
+  <ul class="list tasks">
+    @for (t of b.tasks; track t.id) {
+      <li class="list-row">
+        <div class="list-row__main">
+          <a class="list-row__title task-link" [routerLink]="['/applications', t.applicationId]">{{
+            t.jobTitle
+          }}</a>
+          <p class="list-row__meta">
+            {{ t.companyName }}
+            @if (t.attempts > 1) {
+              · {{ t.attempts }} attempts
+            }
+          </p>
+          @if (t.error) {
+            <p class="error">{{ t.error }}</p>
+          }
+        </div>
+        <app-status-badge [status]="t.status" />
+      </li>
+    }
+  </ul>
+} @else if (notFound()) {
+  <app-page-header
+    heading="Batch not found"
+    [back]="{ label: 'Applications', link: '/applications' }"
+  />
+  <app-empty-state symbol="?" heading="This batch doesn't exist" />
+} @else if (batch.error()) {
+  <app-page-header heading="Batch" [back]="{ label: 'Applications', link: '/applications' }" />
+  <app-empty-state symbol="!" heading="Batch not available">
+    <button type="button" class="btn" (click)="batch.reload()">Try again</button>
+  </app-empty-state>
+} @else {
+  <div class="card stack" role="status" aria-label="Loading batch">
+    <span class="skeleton" style="width: 40%; height: 1.75rem"></span>
+    <span class="skeleton"></span>
+  </div>
+}

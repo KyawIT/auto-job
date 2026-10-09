@@ -1,0 +1,102 @@
+<form [formRoot]="form" class="form-stack">
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label" for="pd-first-name">First name</label>
+      <input
+        class="input"
+        id="pd-first-name"
+        autocomplete="given-name"
+        [formField]="form.firstName"
+      />
+      <app-field-errors [field]="form.firstName" for="pd-first-name" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-last-name">Last name</label>
+      <input
+        class="input"
+        id="pd-last-name"
+        autocomplete="family-name"
+        [formField]="form.lastName"
+      />
+      <app-field-errors [field]="form.lastName" for="pd-last-name" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-email">Email</label>
+      <input
+        class="input"
+        id="pd-email"
+        type="email"
+        autocomplete="email"
+        [formField]="form.email"
+      />
+      <app-field-errors [field]="form.email" for="pd-email" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-phone">Phone <span class="muted">(optional)</span></label>
+      <input class="input" id="pd-phone" type="tel" autocomplete="tel" [formField]="form.phone" />
+      <app-field-errors [field]="form.phone" for="pd-phone" />
+    </div>
+    <div class="field span-all">
+      <label class="field-label" for="pd-desired"
+        >Desired position <span class="muted">(optional)</span></label
+      >
+      <input
+        class="input"
+        id="pd-desired"
+        placeholder="e.g. Frontend developer"
+        [formField]="form.desiredPosition"
+      />
+      <app-field-errors [field]="form.desiredPosition" for="pd-desired" />
+    </div>
+    <div class="field span-all">
+      <label class="field-label" for="pd-street"
+        >Street <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="pd-street" autocomplete="street-address" [formField]="form.street" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-postal">Postal code</label>
+      <input
+        class="input"
+        id="pd-postal"
+        autocomplete="postal-code"
+        [formField]="form.postalCode"
+      />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-city">City</label>
+      <input class="input" id="pd-city" autocomplete="address-level2" [formField]="form.city" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-country">Country</label>
+      <input class="input" id="pd-country" autocomplete="country-name" [formField]="form.country" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="pd-dob"
+        >Date of birth <span class="muted">(optional)</span></label
+      >
+      <input
+        class="input"
+        id="pd-dob"
+        type="date"
+        autocomplete="bday"
+        [formField]="form.dateOfBirth"
+      />
+      <app-field-errors [field]="form.dateOfBirth" for="pd-dob" />
+    </div>
+    <div class="field span-all">
+      <label class="field-label" for="pd-summary"
+        >About you <span class="muted">(optional)</span></label
+      >
+      <textarea class="textarea" id="pd-summary" rows="4" [formField]="form.summary"></textarea>
+      <p class="field-hint">A few sentences the AI can use as your professional summary.</p>
+    </div>
+  </div>
+  <app-field-errors [field]="form" for="pd-form" />
+  <div class="form-actions">
+    <ng-content />
+    <button type="submit" class="btn btn--primary" [disabled]="form().submitting()">
+      {{ form().submitting() ? 'Saving…' : submitLabel() }}
+    </button>
+  </div>
+</form>

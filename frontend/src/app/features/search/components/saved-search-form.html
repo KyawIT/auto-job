@@ -1,0 +1,59 @@
+<form [formRoot]="form" class="form-stack">
+  <div class="form-grid">
+    <div class="field span-all">
+      <label class="field-label" for="ss-name">Name</label>
+      <input class="input" id="ss-name" [formField]="form.name" />
+      <app-field-errors [field]="form.name" for="ss-name" />
+    </div>
+    <div class="field span-all">
+      <label class="field-label" for="ss-keywords">Keywords</label>
+      <input class="input" id="ss-keywords" [formField]="form.keywords" />
+      <app-field-errors [field]="form.keywords" for="ss-keywords" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="ss-location"
+        >Location <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="ss-location" [formField]="form.location" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="ss-radius"
+        >Radius (km) <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="ss-radius" type="number" [formField]="form.radiusKm" />
+      <app-field-errors [field]="form.radiusKm" for="ss-radius" />
+    </div>
+    <fieldset class="field span-all">
+      <legend class="field-label">Sources</legend>
+      <div class="btn-row">
+        <label class="check"
+          ><input type="checkbox" [formField]="form.bundesagentur" /> Bundesagentur für
+          Arbeit</label
+        >
+        <label class="check"
+          ><input id="ss-adzuna" type="checkbox" [formField]="form.adzuna" /> Adzuna</label
+        >
+      </div>
+      <app-field-errors [field]="form.adzuna" for="ss-adzuna" />
+    </fieldset>
+    <div class="field">
+      <label class="field-label" for="ss-interval">Check for new jobs</label>
+      <select class="select" id="ss-interval" [formField]="form.refreshIntervalMinutes">
+        @for (i of intervals; track i.minutes) {
+          <option [value]="'' + i.minutes">{{ i.label }}</option>
+        }
+      </select>
+      <app-field-errors [field]="form.refreshIntervalMinutes" for="ss-interval" />
+    </div>
+    <label class="check align-end"
+      ><input type="checkbox" [formField]="form.isActive" /> Active</label
+    >
+  </div>
+  <app-field-errors [field]="form" for="ss-form" />
+  <div class="form-actions">
+    <button type="button" class="btn" (click)="cancelled.emit()">Cancel</button>
+    <button type="submit" class="btn btn--primary" [disabled]="form().submitting()">
+      Save search
+    </button>
+  </div>
+</form>

@@ -1,0 +1,173 @@
+@if (application.hasValue()) {
+  @let a = application.value();
+  <app-page-header
+    [heading]="a.job.title"
+    [subtitle]="a.job.companyName + ' · ' + languageName(a.language)"
+    [back]="{ label: 'Applications', link: '/applications' }"
+  >
+    <app-status-badge [status]="a.status" />
+    <a class="btn" [routerLink]="['/jobs', a.job.id]">View posting</a>
+    @if (letter()) {
+      <button type="button" class="btn" [disabled]="generating()" (click)="generate()">
+        Regenerate
+      </button>
+    }
+  </app-page-header>
+
+  <div class="layout">
+    <div class="main">
+      @if (generating()) {
+        <section class="card generating" role="status">
+          <div class="progress" aria-hidden="true"><span></span></div>
+          <p><strong>Writing your letter…</strong></p>
+          <p class="muted">
+            The AI reads the posting and your profile. This usually takes 10–30 seconds.
+          </p>
+        </section>
+      }
+
+      @if (letter(); as l) {
+        <section class="card stack" aria-label="Cover letter">
+          <app-text-editor
+            [text]="l"
+            heading="Cover letter"
+            inputId="text-letter"
+            [rows]="20"
+            [disabled]="generating()"
+            (saved)="application.reload()"
+          >
+            <button
+              type="button"
+              class="btn btn--small btn--plain"
+              (click)="versionsOf.set('CoverLetter')"
+            >
+              Versions
+            </button>
+          </app-text-editor>
+          <div class="btn-row export">
+            <button
+              type="button"
+              class="btn btn--primary"
+              [disabled]="!!exporting()"
+              (click)="prepareEmail()"
+            >
+              {{ exporting() === 'email' ? 'Preparing…' : 'Prepare email' }}
+            </button>
+            <button type="button" class="btn" [disabled]="!!exporting()" (click)="export('Pdf')">
+              {{ exporting() === 'Pdf' ? 'Exporting…' : 'Export PDF' }}
+            </button>
+            <button type="button" class="btn" [disabled]="!!exporting()" (click)="export('Docx')">
+              {{ exporting() === 'Docx' ? 'Exporting…' : 'Export Word' }}
+            </button>
+          </div>
+        </section>
+
+        <section class="card stack" aria-labelledby="email-heading">
+          <h2 class="title-3" id="email-heading">Email</h2>
+          @if (subject(); as s) {
+            <app-text-editor
+              [text]="s"
+              heading="Subject"
+              inputId="text-subject"
+              [multiline]="false"
+              [disabled]="generating()"
+            >
+              <button
+                type="button"
+                class="btn btn--small btn--plain"
+                (click)="versionsOf.set('EmailSubject')"
+              >
+                Versions
+              </button>
+            </app-text-editor>
+          }
+          @if (body(); as b) {
+            <app-text-editor
+              [text]="b"
+              heading="Message"
+              inputId="text-body"
+              [rows]="8"
+              [disabled]="generating()"
+            >
+              <button
+                type="button"
+                class="btn btn--small btn--plain"
+                (click)="versionsOf.set('EmailBody')"
+              >
+                Versions
+              </button>
+            </app-text-editor>
+          }
+        </section>
+      } @else if (!generating()) {
+        <app-empty-state
+          symbol="✎"
+          heading="No letter yet"
+          message="Let the AI write a first draft from the posting and your profile. You can edit everything afterwards."
+        >
+          <button type="button" class="btn btn--primary" (click)="generate()">
+            Generate letter
+          </button>
+        </app-empty-state>
+        <p class="notice privacy">
+          <span aria-hidden="true">ⓘ</span>
+          <span
+            >Generating sends your profile and this job posting to NVIDIA's AI service. Nothing else
+            leaves this computer.</span
+          >
+        </p>
+      }
+    </div>
+
+    <div class="side">
+      <section class="card" aria-labelledby="status-heading">
+        <h2 class="title-3" id="status-heading">Progress</h2>
+        <app-status-changer [application]="a" (changed)="update($event)" />
+      </section>
+      <section class="card" aria-labelledby="recipient-heading">
+        <h2 class="title-3" id="recipient-heading">Recipient & language</h2>
+        <app-recipient-form [application]="a" (saved)="update($event)" />
+      </section>
+      <section class="card" aria-labelledby="attachments-heading">
+        <h2 class="title-3" id="attachments-heading">Attachments</h2>
+        <app-attachments-picker [application]="a" (saved)="update($event)" />
+      </section>
+      <section class="card" aria-labelledby="timeline-heading">
+        <h2 class="title-3" id="timeline-heading">Timeline</h2>
+        <app-timeline [application]="a" (changed)="update($event)" />
+      </section>
+      <button type="button" class="btn btn--danger-plain delete" (click)="remove()">
+        Delete application
+      </button>
+    </div>
+  </div>
+
+  <app-versions-sheet [applicationId]="a.id" [(kind)]="versionsOf" (restored)="update($event)" />
+} @else if (notFound()) {
+  <app-page-header
+    heading="Application not found"
+    [back]="{ label: 'Applications', link: '/applications' }"
+  />
+  <app-empty-state
+    symbol="?"
+    heading="This application doesn't exist"
+    message="It may have been deleted."
+  >
+    <a class="btn btn--primary" routerLink="/applications">Back to applications</a>
+  </app-empty-state>
+} @else if (application.error()) {
+  <app-page-header
+    heading="Application"
+    [back]="{ label: 'Applications', link: '/applications' }"
+  />
+  <app-empty-state symbol="!" heading="Application not available" message="It could not be loaded.">
+    <button type="button" class="btn" (click)="application.reload()">Try again</button>
+  </app-empty-state>
+} @else {
+  <div class="card stack" role="status" aria-label="Loading application">
+    <span class="skeleton" style="width: 45%; height: 1.75rem"></span>
+    <span class="skeleton"></span>
+    <span class="skeleton"></span>
+    <span class="skeleton" style="width: 70%"></span>
+  </div>
+}

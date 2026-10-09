@@ -1,0 +1,108 @@
+@if (job.hasValue()) {
+  @let j = job.value();
+  <app-page-header
+    [heading]="j.title"
+    [subtitle]="j.companyName"
+    [back]="{ label: 'Jobs', link: '/jobs' }"
+  >
+    @if (j.applicationId) {
+      <a class="btn btn--primary" [routerLink]="['/applications', j.applicationId]"
+        >Open application</a
+      >
+    } @else {
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="starting()"
+        (click)="startApplication()"
+      >
+        {{ starting() ? 'Starting…' : 'Start application' }}
+      </button>
+    }
+  </app-page-header>
+
+  <div class="layout">
+    <article class="card description" aria-labelledby="description-heading">
+      <h2 class="title-3" id="description-heading">Description</h2>
+      <p class="text">{{ j.description }}</p>
+    </article>
+
+    <div class="side">
+      <section class="card" aria-labelledby="facts-heading">
+        <h2 class="visually-hidden" id="facts-heading">Details</h2>
+        <dl class="facts">
+          @for (f of facts(j); track f.term) {
+            <div>
+              <dt>{{ f.term }}</dt>
+              <dd>{{ f.value }}</dd>
+            </div>
+          }
+          @if (j.salaryMin || j.salaryMax) {
+            <div>
+              <dt>Salary</dt>
+              <dd>
+                {{ j.salaryMin | number: '1.0-0' }}
+                @if (j.salaryMax && j.salaryMax !== j.salaryMin) {
+                  – {{ j.salaryMax | number: '1.0-0' }}
+                }
+                {{ j.salaryCurrency }}
+              </dd>
+            </div>
+          }
+          @if (j.postedAt) {
+            <div>
+              <dt>Posted</dt>
+              <dd>{{ j.postedAt | date: 'mediumDate' }}</dd>
+            </div>
+          }
+          <div>
+            <dt>Status</dt>
+            <dd><app-status-badge [status]="j.state" /></dd>
+          </div>
+        </dl>
+        @if (j.url) {
+          <a class="btn btn--small original" [href]="j.url" target="_blank" rel="noopener"
+            >Open original posting ↗</a
+          >
+        }
+      </section>
+
+      <section class="card actions" aria-label="Triage">
+        @if (j.state === 'Bookmarked') {
+          <button type="button" class="btn" aria-pressed="true" (click)="setState('Seen')">
+            <span aria-hidden="true">★</span> Bookmark
+          </button>
+        } @else {
+          <button type="button" class="btn" aria-pressed="false" (click)="setState('Bookmarked')">
+            <span aria-hidden="true">☆</span> Bookmark
+          </button>
+        }
+        @if (j.state === 'Dismissed') {
+          <button type="button" class="btn" (click)="setState('Seen')">Restore</button>
+        } @else {
+          <button type="button" class="btn" (click)="setState('Dismissed')">Dismiss</button>
+        }
+        @if (!j.applicationId) {
+          <button type="button" class="btn btn--danger-plain" (click)="remove(j)">Delete</button>
+        }
+      </section>
+    </div>
+  </div>
+} @else if (notFound()) {
+  <app-page-header heading="Job not found" [back]="{ label: 'Jobs', link: '/jobs' }" />
+  <app-empty-state symbol="?" heading="This job doesn't exist" message="It may have been deleted.">
+    <a class="btn btn--primary" routerLink="/jobs">Back to jobs</a>
+  </app-empty-state>
+} @else if (job.error()) {
+  <app-page-header heading="Job" [back]="{ label: 'Jobs', link: '/jobs' }" />
+  <app-empty-state symbol="!" heading="Job not available" message="The job could not be loaded.">
+    <button type="button" class="btn" (click)="job.reload()">Try again</button>
+  </app-empty-state>
+} @else {
+  <div class="card stack" role="status" aria-label="Loading job">
+    <span class="skeleton" style="width: 50%; height: 1.75rem"></span>
+    <span class="skeleton"></span>
+    <span class="skeleton"></span>
+    <span class="skeleton" style="width: 80%"></span>
+  </div>
+}

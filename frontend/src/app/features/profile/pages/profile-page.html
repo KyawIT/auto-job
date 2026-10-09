@@ -1,0 +1,248 @@
+<app-page-header
+  heading="Profile"
+  subtitle="Everything the AI knows about you when it writes a letter."
+>
+  <a class="btn" routerLink="/documents">Fill from CV…</a>
+</app-page-header>
+
+@if (profile.hasValue()) {
+  @let p = profile.value();
+  <div class="stack">
+    <section class="card" aria-labelledby="personal-heading">
+      <div class="card-header"><h2 class="title-2" id="personal-heading">Personal data</h2></div>
+      <app-personal-data-form [profile]="p" (saved)="personalSaved()" />
+    </section>
+
+    <section class="card" aria-labelledby="work-heading">
+      <div class="card-header">
+        <h2 class="title-2" id="work-heading">Work experience</h2>
+        <button
+          type="button"
+          class="btn btn--small"
+          (click)="edit({ section: 'work-experiences', entry: null })"
+        >
+          Add
+        </button>
+      </div>
+      @if (p.workExperiences.length) {
+        <ul class="list">
+          @for (w of p.workExperiences; track w.id) {
+            <li class="list-row">
+              <div class="list-row__main">
+                <p class="list-row__title">{{ w.role }} · {{ w.company }}</p>
+                <p class="list-row__meta">
+                  {{ w.startDate | date: 'MMM yyyy' }} –
+                  {{ w.endDate ? (w.endDate | date: 'MMM yyyy') : 'today' }}
+                  @if (w.location) {
+                    · {{ w.location }}
+                  }
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn--small btn--plain"
+                (click)="edit({ section: 'work-experiences', entry: w })"
+                [attr.aria-label]="'Edit ' + w.role"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="btn btn--small btn--danger-plain"
+                (click)="remove('work-experiences', w.id, w.role)"
+                [attr.aria-label]="'Delete ' + w.role"
+              >
+                Delete
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="muted">No work experience yet.</p>
+      }
+    </section>
+
+    <section class="card" aria-labelledby="education-heading">
+      <div class="card-header">
+        <h2 class="title-2" id="education-heading">Education</h2>
+        <button
+          type="button"
+          class="btn btn--small"
+          (click)="edit({ section: 'educations', entry: null })"
+        >
+          Add
+        </button>
+      </div>
+      @if (p.educations.length) {
+        <ul class="list">
+          @for (e of p.educations; track e.id) {
+            <li class="list-row">
+              <div class="list-row__main">
+                <p class="list-row__title">
+                  {{ e.degree }}
+                  @if (e.fieldOfStudy) {
+                    in {{ e.fieldOfStudy }}
+                  }
+                </p>
+                <p class="list-row__meta">
+                  {{ e.institution }}
+                  @if (e.endDate) {
+                    · {{ e.endDate | date: 'yyyy' }}
+                  }
+                  @if (e.grade) {
+                    · Grade {{ e.grade }}
+                  }
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn--small btn--plain"
+                (click)="edit({ section: 'educations', entry: e })"
+                [attr.aria-label]="'Edit ' + e.degree"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="btn btn--small btn--danger-plain"
+                (click)="remove('educations', e.id, e.degree)"
+                [attr.aria-label]="'Delete ' + e.degree"
+              >
+                Delete
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="muted">No education yet.</p>
+      }
+    </section>
+
+    <div class="two-col">
+      <section class="card" aria-labelledby="skills-heading">
+        <div class="card-header">
+          <h2 class="title-2" id="skills-heading">Skills</h2>
+          <button
+            type="button"
+            class="btn btn--small"
+            (click)="edit({ section: 'skills', entry: null })"
+          >
+            Add
+          </button>
+        </div>
+        @if (p.skills.length) {
+          <ul class="list">
+            @for (s of p.skills; track s.id) {
+              <li class="list-row">
+                <div class="list-row__main">
+                  <p class="list-row__title">{{ s.name }}</p>
+                  @if (s.level) {
+                    <p class="list-row__meta">{{ s.level }}</p>
+                  }
+                </div>
+                <button
+                  type="button"
+                  class="btn btn--small btn--plain"
+                  (click)="edit({ section: 'skills', entry: s })"
+                  [attr.aria-label]="'Edit ' + s.name"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn btn--small btn--danger-plain"
+                  (click)="remove('skills', s.id, s.name)"
+                  [attr.aria-label]="'Delete ' + s.name"
+                >
+                  Delete
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No skills yet.</p>
+        }
+      </section>
+
+      <section class="card" aria-labelledby="languages-heading">
+        <div class="card-header">
+          <h2 class="title-2" id="languages-heading">Languages</h2>
+          <button
+            type="button"
+            class="btn btn--small"
+            (click)="edit({ section: 'languages', entry: null })"
+          >
+            Add
+          </button>
+        </div>
+        @if (p.languages.length) {
+          <ul class="list">
+            @for (l of p.languages; track l.id) {
+              <li class="list-row">
+                <div class="list-row__main">
+                  <p class="list-row__title">{{ l.name }}</p>
+                  <p class="list-row__meta">{{ l.level }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn--small btn--plain"
+                  (click)="edit({ section: 'languages', entry: l })"
+                  [attr.aria-label]="'Edit ' + l.name"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn btn--small btn--danger-plain"
+                  (click)="remove('languages', l.id, l.name)"
+                  [attr.aria-label]="'Delete ' + l.name"
+                >
+                  Delete
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="muted">No languages yet.</p>
+        }
+      </section>
+    </div>
+  </div>
+} @else if (profile.error()) {
+  <app-empty-state
+    symbol="!"
+    heading="Profile not available"
+    message="The profile could not be loaded."
+  >
+    <button type="button" class="btn" (click)="profile.reload()">Try again</button>
+  </app-empty-state>
+} @else {
+  <div class="card stack" role="status" aria-busy="true" aria-label="Loading profile">
+    <span class="skeleton" style="width: 40%"></span>
+    <span class="skeleton"></span>
+    <span class="skeleton" style="width: 70%"></span>
+  </div>
+}
+
+<app-sheet [heading]="sheetHeading()" [open]="!!editing()" (openChange)="closeSheet($event)">
+  @if (editing(); as e) {
+    @switch (e.section) {
+      @case ('work-experiences') {
+        <app-work-experience-form
+          [entry]="e.entry"
+          (saved)="saved()"
+          (cancelled)="editing.set(null)"
+        />
+      }
+      @case ('educations') {
+        <app-education-form [entry]="e.entry" (saved)="saved()" (cancelled)="editing.set(null)" />
+      }
+      @case ('skills') {
+        <app-skill-form [entry]="e.entry" (saved)="saved()" (cancelled)="editing.set(null)" />
+      }
+      @case ('languages') {
+        <app-language-form [entry]="e.entry" (saved)="saved()" (cancelled)="editing.set(null)" />
+      }
+    }
+  }
+</app-sheet>

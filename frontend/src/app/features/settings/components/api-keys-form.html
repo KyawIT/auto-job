@@ -1,0 +1,85 @@
+<form [formRoot]="form" class="form-stack" autocomplete="off">
+  <div class="field">
+    <div class="key-label">
+      <label class="field-label" for="key-nim">NVIDIA NIM API key</label>
+      <app-status-badge [status]="nimConfigured() ? 'Configured' : 'Not set'" />
+    </div>
+    <input
+      class="input"
+      id="key-nim"
+      type="password"
+      spellcheck="false"
+      [placeholder]="nimConfigured() ? 'Enter a new key to replace it' : 'nvapi-…'"
+      [formField]="form.nimApiKey"
+    />
+    <p class="field-hint">
+      Used to write cover letters and read your CV. Get a free key at
+      <a href="https://build.nvidia.com" target="_blank" rel="noopener">build.nvidia.com</a>.
+    </p>
+    @if (nimConfigured()) {
+      <div>
+        <button
+          type="button"
+          class="btn btn--small btn--danger-plain"
+          [disabled]="removing()"
+          (click)="remove({ nimApiKey: '' })"
+        >
+          Remove NVIDIA key
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (showAdzuna()) {
+    <div class="form-grid">
+      <div class="field">
+        <div class="key-label">
+          <label class="field-label" for="key-adzuna-id">Adzuna app ID</label>
+          <app-status-badge [status]="adzunaConfigured() ? 'Configured' : 'Not set'" />
+        </div>
+        <input class="input" id="key-adzuna-id" spellcheck="false" [formField]="form.adzunaAppId" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="key-adzuna-key">Adzuna app key</label>
+        <input
+          class="input"
+          id="key-adzuna-key"
+          type="password"
+          spellcheck="false"
+          [formField]="form.adzunaAppKey"
+        />
+      </div>
+      <p class="field-hint span-all">
+        Optional. Adds Adzuna as a job source. Keys from
+        <a href="https://developer.adzuna.com" target="_blank" rel="noopener"
+          >developer.adzuna.com</a
+        >.
+        @if (adzunaConfigured()) {
+          <button
+            type="button"
+            class="btn btn--small btn--danger-plain"
+            [disabled]="removing()"
+            (click)="remove({ adzunaAppId: '', adzunaAppKey: '' })"
+          >
+            Remove Adzuna keys
+          </button>
+        }
+      </p>
+    </div>
+  }
+
+  <p class="notice">
+    <span aria-hidden="true">🔒</span>
+    <span
+      >Keys are stored encrypted on this computer and are only sent to the provider they belong
+      to.</span
+    >
+  </p>
+
+  <div class="form-actions">
+    <ng-content />
+    <button type="submit" class="btn btn--primary" [disabled]="form().submitting()">
+      {{ submitLabel() }}
+    </button>
+  </div>
+</form>

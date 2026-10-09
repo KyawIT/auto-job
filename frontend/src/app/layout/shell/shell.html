@@ -1,0 +1,45 @@
+<a class="skip-link" href="#main">Skip to content</a>
+
+<aside class="sidebar" aria-label="App">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">A</span>
+    <span class="brand-name">AutoJob</span>
+  </div>
+
+  <nav aria-label="Main">
+    @for (section of sections; track section.heading) {
+      <h2 class="nav-heading">{{ section.heading }}</h2>
+      <ul class="nav-list">
+        @for (item of section.items; track item.link) {
+          <li>
+            <a
+              class="nav-link"
+              [routerLink]="item.link"
+              routerLinkActive="active"
+              ariaCurrentWhenActive="page"
+              [attr.aria-keyshortcuts]="keyPrefix + item.key"
+              [title]="item.label + ' (' + modifier + item.key + ')'"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="item.icon" /></svg>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </nav>
+
+  <p class="backend-status" role="status">
+    @if (health.isLoading() && !health.hasValue()) {
+      <span class="dot dot--pending" aria-hidden="true"></span> Connecting…
+    } @else if (health.error()) {
+      <span class="dot dot--error" aria-hidden="true"></span> Backend unreachable
+    } @else {
+      <span class="dot dot--ok" aria-hidden="true"></span> Backend connected
+    }
+  </p>
+</aside>
+
+<main id="main" class="content" tabindex="-1">
+  <router-outlet />
+</main>

@@ -1,0 +1,55 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.description {
+  display: grid;
+  gap: 0.75rem;
+}
+
+// Readable measure and comfortable leading for long-form text.
+.text {
+  max-width: 70ch;
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.side {
+  display: grid;
+  gap: 1rem;
+}
+
+.facts {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+}
+
+.original {
+  margin-top: 1rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

@@ -1,0 +1,171 @@
+<app-page-header
+  heading="Jobs"
+  subtitle="Postings from your searches and the ones you added yourself."
+>
+  <a class="btn" routerLink="/jobs/new">Add manually</a>
+  <a class="btn btn--primary" routerLink="/search">Search for jobs</a>
+</app-page-header>
+
+<div class="toolbar">
+  <nav class="segmented" aria-label="Filter jobs">
+    @for (f of filters; track f.value) {
+      <a
+        [routerLink]="[]"
+        [queryParams]="{ filter: f.value === 'all' ? null : f.value }"
+        queryParamsHandling="merge"
+        [attr.aria-current]="filter() === f.value ? 'page' : null"
+        >{{ f.label }}</a
+      >
+    }
+  </nav>
+  <span class="spacer"></span>
+  <label class="visually-hidden" for="job-search">Search jobs</label>
+  <input
+    id="job-search"
+    class="input search-input"
+    type="search"
+    placeholder="Search title or company  /"
+    data-search
+    [value]="term()"
+    (input)="term.set($any($event.target).value)"
+  />
+</div>
+
+@if (jobs.hasValue() && jobs.value().length) {
+  <div class="list-head">
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="allSelected()"
+        [indeterminate]="selectedIds().length > 0 && !allSelected()"
+        (change)="toggleAll()"
+      />
+      Select all
+    </label>
+    <span class="caption" role="status"
+      >{{ jobs.value().length }} {{ jobs.value().length === 1 ? 'job' : 'jobs' }}</span
+    >
+  </div>
+  <ul class="list" [attr.aria-busy]="jobs.isLoading()">
+    @for (job of jobs.value(); track job.id) {
+      <li class="list-row job-row" [class.selected]="selected().has(job.id)">
+        <input
+          class="row-check"
+          type="checkbox"
+          [checked]="selected().has(job.id)"
+          (change)="toggle(job.id)"
+          [attr.aria-label]="'Select ' + job.title + ' at ' + job.companyName"
+        />
+        <a class="list-row__main job-link" [routerLink]="['/jobs', job.id]">
+          <span class="list-row__title">
+            @if (job.state === 'New') {
+              <span class="new-dot" aria-hidden="true"></span
+              ><span class="visually-hidden">New: </span>
+            }
+            {{ job.title }}
+          </span>
+          <span class="list-row__meta">{{ meta(job) }}</span>
+        </a>
+        <span class="date caption">{{ job.postedAt ?? job.createdAt | date: 'd MMM' }}</span>
+        @if (job.applicationStatus) {
+          <app-status-badge [status]="job.applicationStatus" />
+        }
+        <div class="row-actions">
+          @if (job.state === 'Bookmarked') {
+            <button
+              type="button"
+              class="btn btn--small btn--icon btn--plain"
+              aria-pressed="true"
+              [attr.aria-label]="'Bookmark: ' + job.title"
+              (click)="setState(job, 'Seen')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="filled">
+                <path d="M6 3h12v18l-6-4-6 4z" />
+              </svg>
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn btn--small btn--icon btn--plain"
+              aria-pressed="false"
+              [attr.aria-label]="'Bookmark: ' + job.title"
+              (click)="setState(job, 'Bookmarked')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z" /></svg>
+            </button>
+          }
+          @if (job.state === 'Dismissed') {
+            <button
+              type="button"
+              class="btn btn--small btn--plain"
+              (click)="setState(job, 'Seen')"
+              [attr.aria-label]="'Restore ' + job.title"
+            >
+              Restore
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn btn--small btn--icon btn--plain"
+              [attr.aria-label]="'Dismiss: ' + job.title"
+              (click)="setState(job, 'Dismissed')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+            </button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+} @else if (jobs.hasValue()) {
+  @if (q() || filter() !== 'all') {
+    <app-empty-state
+      symbol="⌕"
+      heading="No matching jobs"
+      message="Try another filter or search term."
+    />
+  } @else {
+    <app-empty-state
+      symbol="✦"
+      heading="No jobs yet"
+      message="Search Bundesagentur für Arbeit or Adzuna, or add a posting you found yourself."
+    >
+      <a class="btn btn--primary" routerLink="/search">Search for jobs</a>
+      <a class="btn" routerLink="/jobs/new">Add manually</a>
+    </app-empty-state>
+  }
+} @else if (jobs.error()) {
+  <app-empty-state
+    symbol="!"
+    heading="Jobs not available"
+    message="The job list could not be loaded."
+  >
+    <button type="button" class="btn" (click)="jobs.reload()">Try again</button>
+  </app-empty-state>
+} @else {
+  <div class="list" role="status" aria-label="Loading jobs">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="list-row"><span class="skeleton" style="width: 55%"></span></div>
+    }
+  </div>
+}
+
+@if (selectedIds().length) {
+  <div
+    class="selection-bar"
+    role="region"
+    aria-label="Selected jobs"
+    animate.enter="bar-enter"
+    animate.leave="bar-leave"
+  >
+    <span
+      ><strong>{{ selectedIds().length }}</strong> selected</span
+    >
+    <button type="button" class="btn btn--plain" (click)="clearSelection()">Clear</button>
+    <button type="button" class="btn btn--primary" (click)="batchOpen.set(true)">
+      Generate letters…
+    </button>
+  </div>
+}
+
+<app-batch-start-sheet [(open)]="batchOpen" [jobIds]="selectedIds()" />

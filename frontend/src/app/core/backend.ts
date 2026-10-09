@@ -1,16 +1,5 @@
 import { Service } from '@angular/core';
-
-interface BackendInfo {
-  url: string;
-  token: string;
-}
-
-declare global {
-  interface Window {
-    // Exposed by electron/preload.js. Undefined when running in a plain browser.
-    autojob?: { getBackend(): Promise<BackendInfo> };
-  }
-}
+import './desktop'; // declares window.autojob
 
 /**
  * Location of the C# sidecar. Inside Electron it comes from the preload bridge;

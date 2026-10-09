@@ -1,0 +1,83 @@
+<app-page-header
+  heading="Add a job"
+  subtitle="Paste a posting you found elsewhere."
+  [back]="{ label: 'Jobs', link: '/jobs' }"
+/>
+
+<form [formRoot]="form" class="card form-stack">
+  <div class="form-grid">
+    <div class="field">
+      <label class="field-label" for="job-title">Job title</label>
+      <input class="input" id="job-title" [formField]="form.title" />
+      <app-field-errors [field]="form.title" for="job-title" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-company">Company</label>
+      <input
+        class="input"
+        id="job-company"
+        autocomplete="organization"
+        [formField]="form.companyName"
+      />
+      <app-field-errors [field]="form.companyName" for="job-company" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-location"
+        >Location <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="job-location" [formField]="form.location" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-url"
+        >Link to posting <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="job-url" type="url" placeholder="https://" [formField]="form.url" />
+      <app-field-errors [field]="form.url" for="job-url" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-mode">Work mode</label>
+      <select class="select" id="job-mode" [formField]="form.workMode">
+        @for (m of workModes; track m) {
+          <option [value]="m">{{ m === 'Unknown' ? 'Not specified' : label(m) }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-type">Employment type</label>
+      <select class="select" id="job-type" [formField]="form.employmentType">
+        @for (t of employmentTypes; track t) {
+          <option [value]="t">{{ t === 'Unknown' ? 'Not specified' : label(t) }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-contact-name"
+        >Contact person <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="job-contact-name" [formField]="form.contactName" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="job-contact-email"
+        >Contact email <span class="muted">(optional)</span></label
+      >
+      <input class="input" id="job-contact-email" type="email" [formField]="form.contactEmail" />
+      <app-field-errors [field]="form.contactEmail" for="job-contact-email" />
+    </div>
+    <div class="field span-all">
+      <label class="field-label" for="job-description">Description</label>
+      <textarea
+        class="textarea"
+        id="job-description"
+        rows="12"
+        [formField]="form.description"
+      ></textarea>
+      <app-field-errors [field]="form.description" for="job-description" />
+      <p class="field-hint">The full posting text. The AI reads it to tailor your letter.</p>
+    </div>
+  </div>
+  <app-field-errors [field]="form" for="job-form" />
+  <div class="form-actions">
+    <a class="btn" routerLink="/jobs">Cancel</a>
+    <button type="submit" class="btn btn--primary" [disabled]="form().submitting()">Add job</button>
+  </div>
+</form>

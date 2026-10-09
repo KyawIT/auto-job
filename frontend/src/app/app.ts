@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { httpResource } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
+import { ToastOutlet } from './layout/toast-outlet';
+import { ConfirmDialog } from './shared/confirm-dialog/confirm-dialog';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  imports: [RouterOutlet, ToastOutlet, ConfirmDialog],
+  template: `
+    <router-outlet />
+    <app-toast-outlet />
+    <app-confirm-dialog />
+  `,
 })
-export class App {
-  protected readonly health = httpResource<{ status: string }>(() => '/health');
-}
+export class App {}

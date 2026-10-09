@@ -1,0 +1,111 @@
+.outlet {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: min(26rem, calc(100vw - 2.5rem));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.625rem 0.5rem 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  // Floating material: thicker blur than small chips, deep shadow.
+  background: color-mix(in srgb, var(--surface-raised) 82%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  touch-action: pan-y;
+  user-select: none;
+  transition:
+    transform var(--spring-duration) var(--spring),
+    opacity 200ms ease;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent-fill);
+}
+
+.toast--success .icon {
+  background: var(--success);
+  color: var(--surface);
+}
+
+.toast--error .icon {
+  background: var(--danger-fill);
+}
+
+.message {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.close {
+  color: var(--text-muted);
+}
+
+// Enter from below, leave the same way (spatial consistency).
+.toast-enter {
+  animation: toast-in var(--spring-bouncy-duration) var(--spring-bouncy);
+}
+
+.toast-leave {
+  animation: toast-out 220ms ease-in forwards;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.96);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .toast {
+    background: var(--surface-raised);
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter {
+    animation: toast-fade 150ms ease;
+  }
+
+  .toast-leave {
+    animation: toast-fade 150ms ease reverse forwards;
+  }
+
+  @keyframes toast-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}

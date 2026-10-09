@@ -1,0 +1,94 @@
+<main class="setup">
+  <div class="panel">
+    <header class="intro">
+      <span class="logo" aria-hidden="true">A</span>
+      <h1 class="title-1" tabindex="-1">Welcome to AutoJob</h1>
+      <p class="muted">Three quick steps. Everything stays on this computer.</p>
+    </header>
+
+    <ol class="steps" aria-label="Setup progress">
+      @for (s of steps; track s.n) {
+        <li
+          [class.done]="step() > s.n"
+          [class.current]="step() === s.n"
+          [attr.aria-current]="step() === s.n ? 'step' : null"
+        >
+          <span class="bubble" aria-hidden="true">{{ step() > s.n ? '✓' : s.n }}</span>
+          <span
+            >{{ s.label
+            }}<span class="visually-hidden">{{ step() > s.n ? ' (done)' : '' }}</span></span
+          >
+        </li>
+      }
+    </ol>
+
+    @switch (step()) {
+      @case (1) {
+        <section class="card step" [class]="'enter-' + direction()" aria-labelledby="step1">
+          <h2 class="title-2" id="step1" tabindex="-1">About you</h2>
+          <p class="muted">Used in every letter's header and signature.</p>
+          @if (profile.isLoading()) {
+            <span class="skeleton" role="status" aria-label="Loading"></span>
+          } @else {
+            <app-personal-data-form
+              [profile]="profile.hasValue() ? profile.value() : null"
+              submitLabel="Continue"
+              (saved)="profileSaved()"
+            />
+          }
+        </section>
+      }
+      @case (2) {
+        <section class="card step" [class]="'enter-' + direction()" aria-labelledby="step2">
+          <h2 class="title-2" id="step2" tabindex="-1">Connect the AI</h2>
+          <p class="muted">
+            AutoJob writes cover letters with NVIDIA NIM using your own free API key. You can add it
+            later in Settings.
+          </p>
+          <app-api-keys-form
+            [showAdzuna]="false"
+            [nimConfigured]="settings.hasValue() && settings.value().nimApiKeyConfigured"
+            submitLabel="Save and continue"
+            (saved)="go(3)"
+          >
+            <button type="button" class="btn btn--plain" (click)="go(1)">Back</button>
+            <button type="button" class="btn" (click)="go(3)">Skip</button>
+          </app-api-keys-form>
+        </section>
+      }
+      @case (3) {
+        <section class="card step" [class]="'enter-' + direction()" aria-labelledby="step3">
+          <h2 class="title-2" id="step3" tabindex="-1">Import your CV</h2>
+          <p class="muted">
+            Optional. Upload your CV and let the AI fill in experience, education, skills and
+            languages.
+          </p>
+          @if (cv(); as doc) {
+            <p class="notice">
+              <span aria-hidden="true">✓</span>
+              <span
+                >"{{ doc.displayName }}" uploaded.
+                @if (doc.extractionStatus !== 'Done') {
+                  It has no readable text, so it can't be imported (scanned PDFs need OCR).
+                }
+              </span>
+            </p>
+            @if (doc.extractionStatus === 'Done') {
+              <div>
+                <app-cv-import-button [document]="doc" [primary]="true" (imported)="finish()" />
+              </div>
+            }
+          } @else {
+            <app-document-uploader fixedType="Cv" (uploaded)="cvUploaded($event)" />
+          }
+          <div class="form-actions">
+            <button type="button" class="btn btn--plain" (click)="go(2)">Back</button>
+            <button type="button" class="btn" [class.btn--primary]="!cv()" (click)="finish()">
+              {{ cv() ? 'Finish without import' : 'Skip and finish' }}
+            </button>
+          </div>
+        </section>
+      }
+    }
+  </div>
+</main>

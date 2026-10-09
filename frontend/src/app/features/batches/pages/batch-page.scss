@@ -1,0 +1,59 @@
+.summary {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.bar {
+  position: relative;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+}
+
+// scaleX from the left on a spring, so each poll eases the bar forward instead of jumping.
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--accent-fill);
+  transform-origin: left;
+  transition: transform var(--spring-duration) var(--spring);
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .danger {
+    color: var(--danger);
+  }
+}
+
+.task-link {
+  display: block;
+  color: inherit;
+}
+
+.error {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--danger);
+}

@@ -55,7 +55,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppSettings");
+                    b.ToTable("AppSettings", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Application", b =>
@@ -107,7 +107,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("Applications");
+                    b.ToTable("Applications", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.ApplicationDocument", b =>
@@ -125,7 +125,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("DocumentId");
 
-                    b.ToTable("ApplicationDocuments");
+                    b.ToTable("ApplicationDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.ApplicationEvent", b =>
@@ -161,7 +161,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ApplicationId");
 
-                    b.ToTable("ApplicationEvents");
+                    b.ToTable("ApplicationEvents", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Document", b =>
@@ -220,7 +220,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("Documents");
+                    b.ToTable("Documents", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Education", b =>
@@ -266,7 +266,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("Educations");
+                    b.ToTable("Educations", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.GeneratedText", b =>
@@ -313,7 +313,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ApplicationId", "Kind", "IsCurrent");
 
-                    b.ToTable("GeneratedTexts");
+                    b.ToTable("GeneratedTexts", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.GenerationBatch", b =>
@@ -345,7 +345,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GenerationBatches");
+                    b.ToTable("GenerationBatches", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.GenerationTask", b =>
@@ -394,7 +394,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("GenerationTasks");
+                    b.ToTable("GenerationTasks", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.JobPosting", b =>
@@ -483,7 +483,7 @@ namespace Persistence.Migrations
                     b.HasIndex("Source", "ExternalId")
                         .IsUnique();
 
-                    b.ToTable("JobPostings");
+                    b.ToTable("JobPostings", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Profile", b =>
@@ -540,7 +540,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Profiles");
+                    b.ToTable("Profiles", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.ProfileLanguage", b =>
@@ -574,7 +574,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("ProfileLanguages");
+                    b.ToTable("ProfileLanguages", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.SavedSearch", b =>
@@ -622,7 +622,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SavedSearches");
+                    b.ToTable("SavedSearches", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Skill", b =>
@@ -655,7 +655,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("Skills");
+                    b.ToTable("Skills", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.WorkExperience", b =>
@@ -701,7 +701,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ProfileId");
 
-                    b.ToTable("WorkExperiences");
+                    b.ToTable("WorkExperiences", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.Application", b =>

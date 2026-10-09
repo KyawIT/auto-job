@@ -20,7 +20,8 @@
     "appId": "com.autojob.app",
     "files": [
       "main.js",
-      "preload.js"
+      "preload.js",
+      "keystore.js"
     ],
     "extraResources": [
       { "from": "../frontend/dist/frontend/browser", "to": "renderer" },

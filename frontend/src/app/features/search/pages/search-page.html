@@ -1,0 +1,111 @@
+<app-page-header
+  heading="Search"
+  subtitle="Find postings on Bundesagentur für Arbeit and Adzuna. Results are added to your jobs."
+>
+  <a class="btn" routerLink="/search/saved">Saved searches</a>
+</app-page-header>
+
+<form [formRoot]="form" class="card search-form" role="search" aria-label="Job search">
+  <div class="field keywords">
+    <label class="field-label" for="s-keywords">Keywords</label>
+    <input
+      class="input"
+      id="s-keywords"
+      placeholder="e.g. Angular developer"
+      data-search
+      [formField]="form.keywords"
+    />
+    <app-field-errors [field]="form.keywords" for="s-keywords" />
+  </div>
+  <div class="field">
+    <label class="field-label" for="s-location">Location</label>
+    <input class="input" id="s-location" placeholder="e.g. Munich" [formField]="form.location" />
+  </div>
+  <div class="field radius">
+    <label class="field-label" for="s-radius">Radius (km)</label>
+    <input class="input" id="s-radius" type="number" [formField]="form.radiusKm" />
+    <app-field-errors [field]="form.radiusKm" for="s-radius" />
+  </div>
+  <fieldset class="field sources">
+    <legend class="field-label">Sources</legend>
+    <div class="btn-row">
+      <label class="check"
+        ><input type="checkbox" [formField]="form.bundesagentur" /> Bundesagentur für Arbeit</label
+      >
+      <label class="check"
+        ><input id="s-adzuna" type="checkbox" [formField]="form.adzuna" /> Adzuna</label
+      >
+    </div>
+    <app-field-errors [field]="form.adzuna" for="s-adzuna" />
+  </fieldset>
+  <app-field-errors [field]="form" for="s-form" />
+  <div class="submit">
+    <button type="submit" class="btn btn--primary" [disabled]="form().submitting()">
+      {{ form().submitting() ? 'Searching…' : 'Search' }}
+    </button>
+  </div>
+</form>
+
+<div class="results">
+  @if (result(); as r) {
+    <div class="summary">
+      <p role="status">
+        <strong>{{ r.jobs.length }}</strong>
+        {{ r.jobs.length === 1 ? 'posting' : 'postings' }} found,
+        <strong>{{ r.newCount }}</strong> new in your jobs.
+      </p>
+      <button type="button" class="btn btn--small" (click)="saveSearch()">Save this search…</button>
+    </div>
+
+    @for (e of r.errors; track e.source) {
+      <p class="notice notice--warning" role="alert">
+        <span aria-hidden="true">!</span>
+        <span>
+          <strong>{{ label(e.source) }}:</strong> {{ e.message }}
+          @if (e.source === 'Adzuna') {
+            <a routerLink="/settings">Check the Adzuna keys in Settings</a>
+          }
+        </span>
+      </p>
+    }
+
+    @if (r.jobs.length) {
+      <ul class="list">
+        @for (job of r.jobs; track job.id) {
+          <li>
+            <a class="list-row" [routerLink]="['/jobs', job.id]">
+              <div class="list-row__main">
+                <p class="list-row__title">{{ job.title }}</p>
+                <p class="list-row__meta">
+                  {{ job.companyName }}
+                  @if (job.location) {
+                    · {{ job.location }}
+                  }
+                  · {{ label(job.source) }}
+                </p>
+              </div>
+              @if (job.postedAt) {
+                <span class="caption">{{ job.postedAt | date: 'd MMM' }}</span>
+              }
+              <app-status-badge [status]="job.applicationStatus ?? job.state" />
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>
+
+<app-sheet
+  heading="Save search"
+  [open]="!!saveDraft()"
+  (openChange)="!$event && saveDraft.set(null)"
+>
+  @if (saveDraft(); as d) {
+    <app-saved-search-form
+      [draft]="d"
+      (saved)="saveDraft.set(null)"
+      (cancelled)="saveDraft.set(null)"
+    />
+  }
+</app-sheet>

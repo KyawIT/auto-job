@@ -1,0 +1,67 @@
+@if (attached().length) {
+  <ol class="attached" aria-label="Attached documents, in email order">
+    @for (d of attached(); track d.id; let i = $index, last = $last) {
+      <li>
+        <span class="n" aria-hidden="true">{{ i + 1 }}</span>
+        <span class="name"
+          >{{ d.displayName }} <span class="caption">{{ label(d.type) }}</span></span
+        >
+        <button
+          type="button"
+          class="btn btn--small btn--icon btn--plain"
+          [disabled]="i === 0"
+          (click)="move(i, -1)"
+          [attr.aria-label]="'Move ' + d.displayName + ' up'"
+        >
+          <span aria-hidden="true">↑</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn--small btn--icon btn--plain"
+          [disabled]="last"
+          (click)="move(i, 1)"
+          [attr.aria-label]="'Move ' + d.displayName + ' down'"
+        >
+          <span aria-hidden="true">↓</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn--small btn--icon btn--danger-plain"
+          (click)="removeAt(i)"
+          [attr.aria-label]="'Remove ' + d.displayName"
+        >
+          <span aria-hidden="true">✕</span>
+        </button>
+      </li>
+    }
+  </ol>
+} @else {
+  <p class="muted">No attachments. The letter PDF is always attached.</p>
+}
+
+@if (available().length) {
+  <div class="field">
+    <label class="field-label" for="attach-add">Add a document</label>
+    <select class="select" id="attach-add" (change)="addFromSelect($event)">
+      <option value="">Choose…</option>
+      @for (d of available(); track d.id) {
+        <option [value]="d.id">{{ d.displayName }} ({{ label(d.type) }})</option>
+      }
+    </select>
+  </div>
+} @else if (documents.hasValue() && !documents.value().length) {
+  <p class="caption">No documents uploaded. <a routerLink="/documents">Upload some</a>.</p>
+}
+
+@if (dirty()) {
+  <div class="form-actions">
+    <button
+      type="button"
+      class="btn btn--small btn--primary"
+      [disabled]="saving()"
+      (click)="save()"
+    >
+      Save attachments
+    </button>
+  </div>
+}

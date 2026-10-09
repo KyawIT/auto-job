@@ -1,0 +1,87 @@
+<app-page-header
+  heading="Documents"
+  subtitle="Your CV, certificates and references. Attach them to applications."
+/>
+
+<div class="stack">
+  <section class="card" aria-labelledby="upload-heading">
+    <div class="card-header"><h2 class="title-2" id="upload-heading">Upload</h2></div>
+    <app-document-uploader (uploaded)="documents.reload()" />
+  </section>
+
+  <section aria-labelledby="list-heading">
+    <h2 class="title-2 visually-hidden" id="list-heading">Your documents</h2>
+    @if (!documents.hasValue() && documents.isLoading()) {
+      <ul class="list" aria-busy="true" aria-label="Loading documents">
+        @for (i of [1, 2, 3]; track i) {
+          <li class="list-row"><span class="skeleton" style="width: 60%"></span></li>
+        }
+      </ul>
+    } @else if (documents.hasValue() && documents.value().length) {
+      <ul class="list">
+        @for (d of documents.value(); track d.id) {
+          <li class="list-row">
+            <span class="doc-icon" aria-hidden="true">{{ extension(d) }}</span>
+            <div class="list-row__main">
+              <p class="list-row__title">{{ d.displayName }}</p>
+              <p class="list-row__meta">
+                {{ label(d.type) }} · {{ formatBytes(d.sizeBytes) }} ·
+                {{ d.createdAt | date: 'mediumDate' }}
+                @if (d.attachByDefault) {
+                  · attached by default
+                }
+                @if (d.extractionStatus === 'NotSupported') {
+                  · no readable text (scanned PDFs need OCR)
+                }
+              </p>
+            </div>
+            @if (d.extractionStatus !== 'Done') {
+              <app-status-badge [status]="d.extractionStatus" />
+            }
+            <div class="actions">
+              @if (d.type === 'Cv' && d.extractionStatus === 'Done') {
+                <app-cv-import-button [document]="d" />
+              }
+              <button
+                type="button"
+                class="btn btn--small btn--plain"
+                (click)="download(d)"
+                [attr.aria-label]="'Download ' + d.displayName"
+              >
+                Download
+              </button>
+              <button
+                type="button"
+                class="btn btn--small btn--plain"
+                (click)="editing.set(d)"
+                [attr.aria-label]="'Edit ' + d.displayName"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="btn btn--small btn--danger-plain"
+                (click)="remove(d)"
+                [attr.aria-label]="'Delete ' + d.displayName"
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <app-empty-state
+        symbol="⇪"
+        heading="No documents yet"
+        message="Upload your CV first. You can then fill your profile from it."
+      />
+    }
+  </section>
+</div>
+
+<app-sheet heading="Edit document" [open]="!!editing()" (openChange)="!$event && editing.set(null)">
+  @if (editing(); as d) {
+    <app-document-edit-form [document]="d" (saved)="saved()" (cancelled)="editing.set(null)" />
+  }
+</app-sheet>

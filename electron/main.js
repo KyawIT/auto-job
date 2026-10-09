@@ -4,12 +4,17 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
+const { KeyStore } = require('./keystore');
 
 const isDev = !app.isPackaged;
 const token = crypto.randomBytes(32).toString('hex');
+const appOrigin = isDev ? 'http://localhost:4200' : 'app://autojob';
+// Where the backend keeps its database and files (email drafts are opened from here).
+const dataDirectory = isDev ? path.join(__dirname, '../backend/api/.data') : app.getPath('userData');
 let backend;
 let backendUrl;
 let quitting = false;
+let keyStore;
 
 // Must run before app is ready. Gives Angular the origin "app://autojob" (allowed by backend CORS).
 protocol.registerSchemesAsPrivileged([
@@ -84,7 +89,6 @@ function createWindow() {
       sandbox: true,
     },
   });
-  const appOrigin = isDev ? 'http://localhost:4200' : 'app://autojob';
 
   // External links open in the user's browser, never inside the app window.
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -98,11 +102,65 @@ function createWindow() {
   win.loadURL(`${appOrigin}/`);
 }
 
+// Sends key changes to the backend, which only keeps them in memory.
+async function pushKeys(keys) {
+  const response = await fetch(`${backendUrl}/api/settings/secrets`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-AutoJob-Token': token },
+    body: JSON.stringify(keys),
+  });
+  if (!response.ok) throw new Error(`Backend answered ${response.status}`);
+}
+
+// Only our own renderer may use the bridge.
+function fromApp(event) {
+  return (event.senderFrame?.url ?? '').startsWith(appOrigin);
+}
+
+function registerBridge() {
+  ipcMain.handle('backend:info', () => ({ url: backendUrl, token }));
+
+  // Encrypt and keep the keys, then hand the change to the running backend.
+  ipcMain.handle('keys:set', async (event, change) => {
+    if (!fromApp(event)) throw new Error('Not allowed');
+    keyStore.update(change ?? {});
+    await pushKeys(change ?? {});
+  });
+
+  // Only files inside the data folder, e.g. the .eml drafts the backend writes.
+  ipcMain.handle('file:open', async (event, fullPath) => {
+    if (!fromApp(event) || typeof fullPath !== 'string') return false;
+    const target = path.resolve(fullPath);
+    const root = path.resolve(dataDirectory) + path.sep;
+    if (!target.startsWith(root) || !fs.existsSync(target)) return false;
+    return (await shell.openPath(target)) === '';
+  });
+
+  ipcMain.handle('file:save', async (event, suggestedName, bytes) => {
+    if (!fromApp(event) || !(bytes instanceof Uint8Array)) return false;
+    const name = path.basename(String(suggestedName)).replace(/[\\/:*?"<>|]/g, '_');
+    const extension = path.extname(name).slice(1);
+    const { canceled, filePath } = await dialog.showSaveDialog(BrowserWindow.fromWebContents(event.sender), {
+      defaultPath: path.join(app.getPath('documents'), name),
+      filters: extension ? [{ name: extension.toUpperCase(), extensions: [extension] }] : [],
+    });
+    if (canceled || !filePath) return false;
+    await fs.promises.writeFile(filePath, bytes);
+    return true;
+  });
+}
+
 app.whenReady()
   .then(async () => {
     if (!isDev) serveAngular();
+    keyStore = new KeyStore(app.getPath('userData'));
     await startBackend();
-    ipcMain.handle('backend:info', () => ({ url: backendUrl, token }));
+    // Keys survive restarts here, not in the backend: hand them over before the UI asks.
+    const keys = keyStore.load();
+    if (Object.keys(keys).length) {
+      await pushKeys(keys).catch((err) => console.error('Could not push API keys:', err.message));
+    }
+    registerBridge();
     createWindow();
   })
   .catch((err) => {

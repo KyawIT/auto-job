@@ -5,7 +5,7 @@ Open-source, local-only desktop app. No server, no cloud: everything runs and is
 | Folder | What | Docs |
 |---|---|---|
 | `backend/` | ASP.NET Core (.NET 10) + EF Core + SQLite, runs as a sidecar process | [backend/README.md](backend/README.md) |
-| `frontend/` | Angular 22 UI, rendered inside the Electron window | – |
+| `frontend/` | Angular 22 UI, rendered inside the Electron window | [frontend/PLAN.md](frontend/PLAN.md) |
 | `electron/` | Desktop shell: starts the backend, opens the window, packages the app | – |
 
 ## Requirements
@@ -27,7 +27,7 @@ npm --prefix electron run dev
 ```
 
 Starts the Angular dev server (hot reload), then Electron, which runs the backend from source.
-The header shows whether the UI can reach the backend.
+The sidebar shows whether the UI can reach the backend. A fresh install opens the setup wizard.
 
 UI only, in a normal browser:
 

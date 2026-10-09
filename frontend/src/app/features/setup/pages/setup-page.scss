@@ -1,0 +1,138 @@
+.setup {
+  min-height: 100vh;
+  padding: 3rem 1.25rem;
+  background:
+    radial-gradient(60rem 30rem at 50% -10%, var(--accent-soft), transparent 70%), var(--bg);
+}
+
+.panel {
+  display: grid;
+  gap: 1.5rem;
+  width: min(44rem, 100%);
+  margin: 0 auto;
+}
+
+.intro {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+
+  h1 {
+    font-size: 2.125rem;
+    letter-spacing: -0.026em;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(160deg, #3b8cff, #0058c7);
+  color: #fff;
+  font-size: 1.625rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .bubble {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition:
+      background-color 200ms ease,
+      transform var(--spring-bouncy-duration) var(--spring-bouncy);
+  }
+
+  .current {
+    color: var(--text);
+    font-weight: 600;
+
+    .bubble {
+      border-color: var(--accent-fill);
+      background: var(--accent-fill);
+      color: #fff;
+      transform: scale(1.08);
+    }
+  }
+
+  .done .bubble {
+    border-color: var(--success);
+    color: var(--success);
+  }
+}
+
+.step {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.75rem;
+
+  h2:focus {
+    outline: none;
+  }
+}
+
+// Steps slide in along the direction of travel; going back reverses the path.
+.enter-forward {
+  animation: step-from-right var(--spring-duration) var(--spring);
+}
+
+.enter-back {
+  animation: step-from-left var(--spring-duration) var(--spring);
+}
+
+@keyframes step-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes step-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-forward,
+  .enter-back {
+    animation: step-fade 150ms ease;
+  }
+
+  @keyframes step-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
