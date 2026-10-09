@@ -1,0 +1,16 @@
+<header class="app-header">
+  <h1 class="app-title">AutoJob</h1>
+  <p class="backend-status" role="status">
+    @if (health.isLoading()) {
+      <span class="dot dot--pending" aria-hidden="true"></span> Connecting to backend…
+    } @else if (health.error()) {
+      <span class="dot dot--error" aria-hidden="true"></span> Backend unreachable
+    } @else {
+      <span class="dot dot--ok" aria-hidden="true"></span> Backend connected
+    }
+  </p>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>

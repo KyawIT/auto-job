@@ -1,0 +1,36 @@
+{
+  "name": "autojob",
+  "productName": "AutoJob",
+  "version": "0.1.0",
+  "description": "Local-only desktop app",
+  "private": true,
+  "main": "main.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "concurrently -k -n angular,electron -c magenta,cyan \"npm --prefix ../frontend start\" \"wait-on http://localhost:4200 && electron .\"",
+    "build:frontend": "npm --prefix ../frontend run build",
+    "build:backend:win": "dotnet publish ../backend/api -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -o ../backend/publish/win",
+    "build:backend:mac": "dotnet publish ../backend/api -c Release -r osx-arm64 --self-contained -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -o ../backend/publish/mac",
+    "build:backend:linux": "dotnet publish ../backend/api -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -o ../backend/publish/linux",
+    "dist:win": "npm run build:frontend && npm run build:backend:win && electron-builder --win",
+    "dist:mac": "npm run build:frontend && npm run build:backend:mac && electron-builder --mac",
+    "dist:linux": "npm run build:frontend && npm run build:backend:linux && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.autojob.app",
+    "files": [
+      "main.js",
+      "preload.js"
+    ],
+    "extraResources": [
+      { "from": "../frontend/dist/frontend/browser", "to": "renderer" },
+      { "from": "../backend/publish/${os}", "to": "backend", "filter": ["**/*", "!*.pdb"] }
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
+    "wait-on": "^9.5.1"
+  }
+}

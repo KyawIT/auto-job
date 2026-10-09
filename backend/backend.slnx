@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="api/api.csproj" />
+  <Project Path="Core/Core.csproj" />
+  <Project Path="Persistence/Persistence.csproj" />
+</Solution>

@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+publish/
+
+# Local dev database and logs
+.data/
+*.db
+*.db-shm
+*.db-wal
